@@ -2,7 +2,7 @@ pub mod statistics{
 
     use std::iter::Sum;
 
-    trait Numeric {
+    pub trait Numeric {
         fn to_f64(&self) -> f64;
     }
 
@@ -22,15 +22,16 @@ pub mod statistics{
         where
             T: Numeric,
     {
-        let count = x.len() as f64;
-        x.iter().map(|val| val.to_f64()).sum() / count
+
+        x.iter().map(|e| e.to_f64()).sum::<f64>() / x.len() as f64
     }
 
 
-    pub fn geometric_mean<T: Into<f64>>(x: &[T]) -> f64{
-        return 0.0;
+    pub fn geometric_mean<T: Into<f64>>(x: &[T]) -> f64 where T:Numeric{
+
+        return (x.iter().map(|v| v.to_f64()).product::<f64>()).powf(1.0/(x.len()as f64));
     }
-    pub fn harmonic_mean<T: Into<f64>>(x: &[T]) -> f64{
+    pub fn harmonic_mean<T: Into<f64>>(x: &[T]) -> f64 where T:Numeric{
 
         return 0.0;
     }
