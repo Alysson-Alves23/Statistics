@@ -27,11 +27,15 @@ pub mod statistics{
     }
 
 
-    pub fn geometric_mean<T: Into<f64>>(x: &[T]) -> f64 where T:Numeric{
+    pub fn geometric_mean<T>(x: &[T]) -> f64 where T:Numeric{
 
-        return (x.iter().map(|v| v.to_f64()).product::<f64>()).powf(1.0/(x.len()as f64));
+        return (x.iter().map(|e| e.to_f64()).product::<f64>()).powf(1.0/(x.len()as f64));
     }
-    pub fn harmonic_mean<T: Into<f64>>(x: &[T]) -> f64 where T:Numeric{
+    pub fn harmonic_mean<T>(x: &[T]) -> f64 where T:Numeric{
+
+        return x.len() as f64/x.iter().map(|e| 1.0/e.to_f64()).sum::<f64>();
+    }
+    pub fn harmonic_mean_pound<T,R>(x: &[T],pound:&[R]) -> f64 where T:Numeric,R:Numeric{
 
         return 0.0;
     }
