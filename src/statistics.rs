@@ -35,12 +35,14 @@ pub mod statistics{
 
         return x.len() as f64/x.iter().map(|e| 1.0/e.to_f64()).sum::<f64>();
     }
-    pub fn harmonic_mean_pound<T,R>(x: &[T],pound:&[R]) -> f64 where T:Numeric,R:Numeric{
+    pub fn w_harmonic_mean<T,R>(x: &[T],pound:&[R]) -> f64 where T:Numeric,R:Numeric{
 
-        return 0.0;
+        return x.len() as f64/x.iter().zip(pound.iter()).map(|(e,p)| p.to_f64()/e.to_f64()).sum::<f64>();
+
     }
 
     pub fn median<T: Into<f64>>(x: &[T]) -> f64{
+
     return 0.0;
     }
     pub fn median_low<T: Into<f64>>(x: &[T]) -> f64{
