@@ -1,6 +1,6 @@
 
 pub mod statistics{
-    use crate::statistics::utils::quick_sort;
+    use crate::statistics::utils::qs::quick_select;
 
     pub trait Numeric {
         fn to_f64(&self) -> f64;
@@ -41,33 +41,20 @@ pub mod statistics{
 
     }
 
-    pub fn median<T: Into<f64>>(x: &[T]) -> f64 where  T:Numeric,T:Clone{
-        let mut bind = x.to_owned();
-        let x:&mut [T]= bind.as_mut_slice();
-        let mid :usize = x.len()/2;
-
-
-        if x.len()>5 {
-            let branch = x.split_at_mut(x.len() / 5);
-            median(branch.1);
+    pub fn median<T>(x: &mut [T]) -> f64
+        where
+            T: Numeric + Clone,
+    {
+        let n = x.len();
+        return if n % 2 == 0 {
+            let median1 = quick_select(x, n / 2);
+            let median2 = quick_select(x, n / 2 - 1);
+            (median1.to_f64() + median2.to_f64()) / 2.0
+        } else {
+            quick_select(x, n / 2).to_f64()
         }
-        // let to_ord:&mut Vec<f64> = &mut vec![];
-        // for e in x{
-        //     to_ord.push(e.to_f64());
-        // }
-        // let mut to_ord = to_ord.to_owned();
-        // let x:&mut [f64]= to_ord.as_mut_slice();
-       quick_sort(x);
-
-        if x.len()%2 == 0{
-            return  (x[mid - 1].to_f64() + x[mid].to_f64())/2.0
-
-        }
-
-       return  x[mid].to_f64();
-
-
     }
+
     pub fn median_low<T: Into<f64>>(_x: &[T]) -> f64{
         return 0.0;
     }
@@ -117,41 +104,55 @@ pub mod statistics{
     }
 }
 
-pub mod utils{
-    use crate::statistics::statistics::Numeric;
+pub(crate) mod utils{
 
-    pub fn quick_sort<T>(x: &mut [T])
-        where
-            T: Numeric + Clone,
-    {
-        let len = x.len();
+   pub mod qs {
+        use rand::Rng;
+        use crate::statistics::statistics::Numeric;
 
-        if len > 1 {
-            let pivot_idx = partition(x);
-            let (left, right) = x.split_at_mut(pivot_idx);
+        pub fn quick_select<T>(x: &mut [T], k: usize) -> T
+            where T: Numeric + Clone,
+        {
+            let n = x.len();
+            if n == 1 {
+                return x[0].clone();
+            }
 
-            quick_sort(left);
-            quick_sort(&mut right[1..]);
-        }
-    }
+            let pivot = partition(x);
 
-    fn partition<T>(x: &mut [T]) -> usize
-        where
-            T: Numeric + Clone,
-    {
-        let len = x.len();
-        let pivot_idx = len / 2;
-
-        x.swap(pivot_idx, len - 1);
-
-        let mut i = 0;
-        for j in 0..len - 1 {
-            if x[j].to_f64() <= x[len - 1].to_f64() {
-                x.swap(i, j);
-                i += 1;
+            return if k == pivot {
+                x[k].clone()
+            } else if k < pivot {
+                quick_select(&mut x[0..pivot], k)
+            } else {
+                quick_select(&mut x[pivot + 1..], k - pivot - 1)
             }
         }
-        x.swap(i, len - 1);
-        i
+
+
+        fn partition<T>(x: &mut [T]) -> usize
+            where
+                T: Numeric,
+        {
+            let n = x.len();
+            if n <= 1 {
+                return 0;
+            }
+
+            let pivot = rand::thread_rng().gen_range(0..n);
+            x.swap(pivot, n - 1);
+
+            let mut i = 0;
+            for j in 0..n - 1 {
+                if x[j].to_f64() <= x[n - 1].to_f64() {
+                    x.swap(i, j);
+                    i += 1;
+                }
+            }
+
+            x.swap(i, n - 1);
+
+            i
+        }
     }
 }
