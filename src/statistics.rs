@@ -4,17 +4,23 @@ pub mod statistics{
 
     pub trait Numeric {
         fn to_f64(&self) -> f64;
+        fn pow(&self, x:u32) -> f64;
     }
 
     impl Numeric for i32 {
         fn to_f64(&self) -> f64 {
             *self as f64
         }
+        fn pow(&self,x:u32) -> f64{ (*self as u32).pow(x) as f64 }
     }
 
     impl Numeric for f64 {
         fn to_f64(&self) -> f64 {
             *self
+        }
+
+        fn pow(&self, x: u32) -> f64 {
+            { (*self as u32).pow(x) as f64 }
         }
     }
 
@@ -46,20 +52,33 @@ pub mod statistics{
             T: Numeric + Clone,
     {
         let n = x.len();
-        return if n % 2 == 0 {
+        if n % 2 == 0 {
             let median1 = quick_select(x, n / 2);
             let median2 = quick_select(x, n / 2 - 1);
-            (median1.to_f64() + median2.to_f64()) / 2.0
+            return (median1.to_f64() + median2.to_f64()) / 2.0;
         } else {
-            quick_select(x, n / 2).to_f64()
+            return quick_select(x, n / 2).to_f64();
         }
     }
 
-    pub fn median_low<T: Into<f64>>(_x: &[T]) -> f64{
-        return 0.0;
+    pub fn median_low<T: Into<f64>>(x: &mut [T]) -> f64
+        where
+            T: Numeric + Clone,
+    {
+        let n = x.len();
+
+            return quick_select(x, n / 2 -1).to_f64();
+
     }
-    pub  fn median_high<T: Into<f64>>(_x: &[T]) -> f64{
-        return 0.0;
+
+    pub fn median_high<T: Into<f64>>(x: &mut [T]) -> f64
+        where
+            T: Numeric + Clone,
+    {
+        let n = x.len();
+
+        return quick_select(x, n / 2).to_f64();
+
     }
     pub fn median_grouped<T: Into<f64>>(_x: &[T]) -> f64{
         return 0.0;
@@ -120,12 +139,12 @@ pub(crate) mod utils{
 
             let pivot = partition(x);
 
-            return if k == pivot {
-                x[k].clone()
+            if k == pivot {
+                return x[k].clone();
             } else if k < pivot {
-                quick_select(&mut x[0..pivot], k)
+                return quick_select(&mut x[0..pivot], k);
             } else {
-                quick_select(&mut x[pivot + 1..], k - pivot - 1)
+                return quick_select(&mut x[pivot+1..], k - pivot - 1);
             }
         }
 
